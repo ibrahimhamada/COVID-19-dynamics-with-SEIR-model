@@ -1,0 +1,270 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>LR_firstrial_WW</title><meta name="generator" content="MATLAB 9.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-05-06"><meta name="DC.source" content="LR_firstrial_WW.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Reading the excel file</a></li><li><a href="#2">Calculating the confirmed cases in each day indvidualy</a></li><li><a href="#3">Calculating the Death cases in each day individualy</a></li><li><a href="#4">Calculating the recovered cases in each day individualy</a></li><li><a href="#5">Normalize the the vectors by getting vectors starting from 15/3</a></li><li><a href="#6">making linear regression</a></li></ul></div><h2 id="1">Reading the excel file</h2><pre class="codeinput"><span class="comment">%load total_cases.CSV xm fn</span>
+[num ,st, raw]=xlsread(<span class="string">'total_cases.csv'</span>);
+timeAxis= raw(2:end,1);
+wwcases= num(:,1);
+t=linspace(1,length(timeAxis),length(timeAxis)); <span class="comment">% time in days</span>
+
+<span class="comment">% loading total death cases</span>
+[num1 ,st1, raw1]=xlsread(<span class="string">'total_deaths.csv'</span>);
+timeAxis1= raw1(2:end,1);
+Dcases= num1(:,1);
+t1=linspace(1,length(timeAxis),length(timeAxis)); <span class="comment">% time in days</span>
+
+
+<span class="comment">% loading recovered cases</span>
+[num2 ,st2, raw2]=xlsread(<span class="string">'time_series_covid19_recovered_global.xlsx'</span>);
+RecoveredCases= num2(253,3:end);
+t1=linspace(1,length(RecoveredCases),length(RecoveredCases)); <span class="comment">% time in days</span>
+
+
+figure
+</pre><img vspace="5" hspace="5" src="LR_firstrial_WW_01.png" alt=""> <h2 id="2">Calculating the confirmed cases in each day indvidualy</h2><pre class="codeinput">confirmedCD=zeros(1,length(num(:,1)));
+<span class="keyword">for</span> i=1:length(num(:,1))
+    confirmedCD(i)=num(i,1);
+
+<span class="keyword">for</span> j=1:i-1
+    <span class="keyword">if</span> (i~=1)
+confirmedCD(i)=confirmedCD(i)-confirmedCD(j);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+stem(confirmedCD)
+title(<span class="string">'Daily confirmed cases'</span>)
+grid <span class="string">on</span>
+xlabel(<span class="string">'time in days'</span>)
+</pre><img vspace="5" hspace="5" src="LR_firstrial_WW_02.png" alt=""> <h2 id="3">Calculating the Death cases in each day individualy</h2><pre class="codeinput">DeathCD=zeros(1,length(num1(:,1)));
+<span class="keyword">for</span> i=1:length(num1(:,1))
+    DeathCD(i)=num1(i,1);
+
+<span class="keyword">for</span> j=1:i-1
+    <span class="keyword">if</span> (i~=1)
+DeathCD(i)=DeathCD(i)-DeathCD(j);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+figure
+stem(DeathCD)
+title(<span class="string">'Daily Death cases '</span>)
+grid <span class="string">on</span>
+xlabel(<span class="string">'time in days'</span>)
+</pre><img vspace="5" hspace="5" src="LR_firstrial_WW_03.png" alt=""> <h2 id="4">Calculating the recovered cases in each day individualy</h2><pre class="codeinput"><span class="keyword">for</span> i=1:length(RecoveredCases)
+    RecoveredCD(i)=num2(253,i+2);
+
+<span class="keyword">for</span> j=1:i-1
+    <span class="keyword">if</span> (i~=1)
+RecoveredCD(i)=RecoveredCD(i)-RecoveredCD(j);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="keyword">end</span>
+figure
+stem(RecoveredCD)
+title(<span class="string">'Daily Recovered cases '</span>)
+grid <span class="string">on</span>
+xlabel(<span class="string">'time in days'</span>)
+</pre><img vspace="5" hspace="5" src="LR_firstrial_WW_04.png" alt=""> <img vspace="5" hspace="5" src="LR_firstrial_WW_05.png" alt=""> <h2 id="5">Normalize the the vectors by getting vectors starting from 15/3</h2><pre class="codeinput">NRC= RecoveredCD(58:end-1);
+NDC= DeathCD(80:end-2);
+NIC= wwcases(80:end);
+<span class="comment">%calculating the acummulative active cases only in every day</span>
+<span class="keyword">for</span> i=1:length(NRC)
+NIC(i)=NIC(i)-NRC(i)-NDC(i);
+<span class="keyword">end</span>
+
+subplot(1,2,1)
+stem(NIC, NRC);
+title(<span class="string">'Reovered cases w.r.t active cases '</span>);
+xlabel(<span class="string">'active cases'</span>);
+ylabel(<span class="string">'Recovered cases'</span>);
+subplot(1,2,2);
+stem(NIC,NDC);
+title(<span class="string">'Death cases w.r.t active cases '</span>);
+xlabel(<span class="string">'active cases'</span>);
+ylabel(<span class="string">'Death cases'</span>);
+</pre><img vspace="5" hspace="5" src="LR_firstrial_WW_06.png" alt=""> <h2 id="6">making linear regression</h2><pre class="codeinput">figure
+plotregression(NIC,NRC)
+title(<span class="string">'LR for recover ratio'</span>)
+ylim([0 1e4])
+
+grid <span class="string">on</span>
+figure
+plotregression(NIC, NDC)
+grid <span class="string">on</span>
+title(<span class="string">'LR  for Death ratio'</span>)
+ylim([0 1e4])
+</pre><img vspace="5" hspace="5" src="LR_firstrial_WW_07.png" alt=""> <img vspace="5" hspace="5" src="LR_firstrial_WW_08.png" alt=""> <img vspace="5" hspace="5" src="LR_firstrial_WW_09.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2018b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Reading the excel file 
+%load total_cases.CSV xm fn
+[num ,st, raw]=xlsread('total_cases.csv');
+timeAxis= raw(2:end,1);
+wwcases= num(:,1);
+t=linspace(1,length(timeAxis),length(timeAxis)); % time in days
+
+% loading total death cases 
+[num1 ,st1, raw1]=xlsread('total_deaths.csv');
+timeAxis1= raw1(2:end,1);
+Dcases= num1(:,1);
+t1=linspace(1,length(timeAxis),length(timeAxis)); % time in days
+
+
+% loading recovered cases 
+[num2 ,st2, raw2]=xlsread('time_series_covid19_recovered_global.xlsx');
+RecoveredCases= num2(253,3:end);
+t1=linspace(1,length(RecoveredCases),length(RecoveredCases)); % time in days
+
+
+figure
+
+%% Calculating the confirmed cases in each day indvidualy 
+confirmedCD=zeros(1,length(num(:,1)));
+for i=1:length(num(:,1))
+    confirmedCD(i)=num(i,1);
+
+for j=1:i-1
+    if (i~=1)
+confirmedCD(i)=confirmedCD(i)-confirmedCD(j);
+    end
+end
+end
+stem(confirmedCD)
+title('Daily confirmed cases')
+grid on
+xlabel('time in days')
+
+%% Calculating the Death cases in each day individualy 
+DeathCD=zeros(1,length(num1(:,1)));
+for i=1:length(num1(:,1))
+    DeathCD(i)=num1(i,1);
+
+for j=1:i-1
+    if (i~=1)
+DeathCD(i)=DeathCD(i)-DeathCD(j);
+    end
+end
+end
+figure
+stem(DeathCD)
+title('Daily Death cases ')
+grid on
+xlabel('time in days')
+
+%% Calculating the recovered cases in each day individualy 
+for i=1:length(RecoveredCases)
+    RecoveredCD(i)=num2(253,i+2);
+
+for j=1:i-1
+    if (i~=1)
+RecoveredCD(i)=RecoveredCD(i)-RecoveredCD(j);
+    end
+end
+end
+figure
+stem(RecoveredCD)
+title('Daily Recovered cases ')
+grid on
+xlabel('time in days')
+%% Normalize the the vectors by getting vectors starting from 15/3
+NRC= RecoveredCD(58:end-1);
+NDC= DeathCD(80:end-2);
+NIC= wwcases(80:end);
+%calculating the acummulative active cases only in every day
+for i=1:length(NRC)
+NIC(i)=NIC(i)-NRC(i)-NDC(i);
+end 
+
+subplot(1,2,1)
+stem(NIC, NRC);
+title('Reovered cases w.r.t active cases ');
+xlabel('active cases');
+ylabel('Recovered cases');
+subplot(1,2,2);
+stem(NIC,NDC);
+title('Death cases w.r.t active cases ');
+xlabel('active cases');
+ylabel('Death cases');
+
+
+%% making linear regression
+figure
+plotregression(NIC,NRC)
+title('LR for recover ratio')
+ylim([0 1e4])
+
+grid on
+figure 
+plotregression(NIC, NDC)
+grid on
+title('LR  for Death ratio')
+ylim([0 1e4])
+
+
+
+##### SOURCE END #####
+--></body></html>
